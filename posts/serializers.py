@@ -11,7 +11,7 @@ class PostSerializer(serializers.ModelSerializer):
     # Use rest framework's field level validation methods, they're called validate_fieldname, in this case validate_image
     # If we use this naming convention, this method will be called automatically and validate the uploaded image every time we create or update a post
     # This takes two arguments, self and value which is the uploaded image
-    def validate_image(self, value)
+    def validate_image(self, value):
         # We'll check if the file size is bigger than 2 megabytes. The default file size unit is a byte. If we multiply it by 1024, we'll get kilobytes
         # Mulitplied again by 1024, we'll get megabytes. We then multiply it by 2 and we'll get the 2 megabyte file size limit.
         if value.size > 1024 * 1024 * 2:
