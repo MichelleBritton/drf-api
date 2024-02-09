@@ -76,6 +76,7 @@
 # Refactured code to use generic views
 from django.db.models import Count
 from rest_framework import generics, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_api.permissions import IsOwnerOrReadOnly
 from .models import Profile
 from .serializers import ProfileSerializer
@@ -106,7 +107,11 @@ class ProfileList(generics.ListAPIView):
 
     # To create a filter and made the fields sortable, set the filter_backends attribute to OrderingFilter and set the ordering_fields to the fields we just annotated
     filter_backends = [
-        filters.OrderingFilter
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
+    filterset_fields = [
+        'owner__following__followed__profile'
     ]
     ordering_fields = [
         'posts_count',
