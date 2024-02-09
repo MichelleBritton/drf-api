@@ -74,7 +74,8 @@
 
 
 # Refactured code to use generic views
-from rest_framework import generics
+from django.db.models import Count
+from rest_framework import generics, filters
 from drf_api.permissions import IsOwnerOrReadOnly
 from .models import Profile
 from .serializers import ProfileSerializer
@@ -85,8 +86,35 @@ class ProfileList(generics.ListAPIView):
     List all profiles.
     No create view as profile creation is handled by django signals.
     """
-    queryset = Profile.objects.all()
+    # queryset = Profile.objects.all()
+
+    # The annotate function allows us to define extra fields to be added to the queryset. In this case
+    # we will add fields to work out how many posts and followers a user have and how many others they're following
+    # Define field called posts_count, for how many posts a user has, and then we'll use the Count class we imported
+    # earlier because we want to count how many posts there are. There is no direct relationship between profile and post so we need
+    # to go through the user model to get there, so inside the Count class we will need to perform a lookup that spans the profile, user and post
+    # models, so we can get to the POst model with the instances we want to count. Similar to when we used dot notation, the first part of our lookup
+    # string is the owner field on the profile model, which is a OneToOne field referencing user. From there we can reach the Post model, so we have to 
+    # add double underscore post to show the relationship between Profile, User and Post. As we'll be defining more than one field inside the annotate function, 
+    # we also need to pass distinct=True here to only count the unique posts, without this there would be duplicates.
+    queryset = Profile.objects.annotate(
+        posts_count=Count('owner__post', distinct=True),
+        followers_count=Count('owner__followed', distinct=True),
+        following_count=Count('owner__following', distinct=True)
+    ).order_by('-created_at')
     serializer_class = ProfileSerializer
+
+    # To create a filter and made the fields sortable, set the filter_backends attribute to OrderingFilter and set the ordering_fields to the fields we just annotated
+    filter_backends = [
+        filters.OrderingFilter
+    ]
+    ordering_fields = [
+        'posts_count',
+        'followers_count',
+        'following_count',
+        'owner__following__created_at',
+        'owner__followed__created_at',
+    ]
 
 
 class ProfileDetail(generics.RetrieveUpdateAPIView):
@@ -94,5 +122,10 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
     Retrieve or update a profile if you're the owner.
     """
     permission_classes = [IsOwnerOrReadOnly]
-    queryset = Profile.objects.all()
+    # queryset = Profile.objects.all()
+    queryset = Profile.objects.annotate(
+        posts_count=Count('owner__post', distinct=True),
+        followers_count=Count('owner__followed', distinct=True),
+        following_count=Count('owner__following', distinct=True)
+    ).order_by('-created_at')
     serializer_class = ProfileSerializer
