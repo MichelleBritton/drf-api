@@ -61,7 +61,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = 'DEV' in os.environ
 
-ALLOWED_HOSTS = ['8000-michellebritton-drfapi-7q2trm12id5.ws-eu108.gitpod.io', 'https://djangorf-api-76c3c6fb6902']
+ALLOWED_HOSTS = ['8000-michellebritton-drfapi-7q2trm12id5.ws-eu108.gitpod.io', 'djangorf-api-76c3c6fb6902']
 
 
 # Application definition
