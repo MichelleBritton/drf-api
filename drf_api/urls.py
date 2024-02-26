@@ -24,7 +24,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     # our logout route has to be above teh default one to be matched first
     path('api/dj-rest-auth/logout/', logout_route),
-    path('api/dj_rest_auth/', include('dj_rest_auth.urls')),
+    path('api/dj-rest-auth/', include('dj_rest_auth.urls')),
     path(
         'api/dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')
     ),
